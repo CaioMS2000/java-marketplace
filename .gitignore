@@ -34,3 +34,4 @@ build/
 
 # others
 .mvn
+.mcp.json
