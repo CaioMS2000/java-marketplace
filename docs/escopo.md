@@ -21,7 +21,7 @@ O mínimo necessário para o fluxo nuclear funcionar ponta a ponta.
 **Identidade**
 - Cadastro e login de Cliente e Vendedor.
 - Papéis `USER` / `SELLER` / `ADMIN`, autorização por papel.
-- JWT (já implementado).
+- JWT.
 
 **Catálogo** — *CRUD simples, modelo anêmico apropriado*
 - Vendedor cria, edita e lista os próprios produtos.
