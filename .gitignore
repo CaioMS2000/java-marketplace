@@ -35,3 +35,5 @@ build/
 # others
 .mvn
 .mcp.json
+.env
+.env.test
