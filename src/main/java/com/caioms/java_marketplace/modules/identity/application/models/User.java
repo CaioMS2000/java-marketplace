@@ -1,4 +1,4 @@
-package com.caioms.java_marketplace.identity;
+package com.caioms.java_marketplace.modules.identity.application.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

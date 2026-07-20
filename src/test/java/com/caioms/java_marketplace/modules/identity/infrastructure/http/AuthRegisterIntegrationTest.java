@@ -1,11 +1,13 @@
-package com.caioms.java_marketplace.identity;
+package com.caioms.java_marketplace.modules.identity.infrastructure.http;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.caioms.java_marketplace.TestcontainersConfiguration;
-import com.caioms.java_marketplace.identity.dto.RegisterRequest;
-import com.caioms.java_marketplace.identity.dto.RegisterResponse;
+import com.caioms.java_marketplace.modules.identity.application.models.Role;
+import com.caioms.java_marketplace.modules.identity.application.repositories.UserRepository;
+import com.caioms.java_marketplace.modules.identity.infrastructure.http.dto.RegisterUserRequest;
+import com.caioms.java_marketplace.modules.identity.infrastructure.http.dto.RegisterUserResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +33,7 @@ class AuthRegisterIntegrationTest {
 
   @Test
   void registersUserAndPersistsHashedPassword() {
-    var request = new RegisterRequest("alice@example.com", "secret123", Role.USER);
+    var request = new RegisterUserRequest("alice@example.com", "secret123", Role.USER);
 
     var response =
         client()
@@ -40,7 +42,7 @@ class AuthRegisterIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .body(request)
             .retrieve()
-            .toEntity(RegisterResponse.class);
+            .toEntity(RegisterUserResponse.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     assertThat(response.getBody()).isNotNull();
@@ -59,7 +61,7 @@ class AuthRegisterIntegrationTest {
 
   @Test
   void rejectsAdminSelfRegistration() {
-    var request = new RegisterRequest("eve@example.com", "secret123", Role.ADMIN);
+    var request = new RegisterUserRequest("eve@example.com", "secret123", Role.ADMIN);
 
     assertThatThrownBy(
             () ->
