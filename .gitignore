@@ -37,3 +37,9 @@ build/
 .mcp.json
 .env
 .env.test
+commit-stages.sh
+generate-commit-message-task.md
+git-info-for-commit.sh
+*.txt
+*.md
+!docs/*/*.md
