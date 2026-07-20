@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import;
 @Import(TestcontainersConfiguration.class)
 class JavaMarketplaceApplicationTests {
 
-  @Test
-  void contextLoads() {}
+	@Test
+	void contextLoads() {
+	}
 }

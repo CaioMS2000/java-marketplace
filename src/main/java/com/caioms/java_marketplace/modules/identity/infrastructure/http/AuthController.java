@@ -19,25 +19,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final RegisterUserUseCase registerUser;
+	private final RegisterUserUseCase registerUser;
 
-  @PostMapping("/register")
-  public ResponseEntity<Object> register(@Valid @RequestBody RegisterUserRequest request) {
-    var result =
-        registerUser.execute(
-            new RegisterUserParams(request.email(), request.password(), request.role()));
+	@PostMapping("/register")
+	public ResponseEntity<Object> register(@Valid @RequestBody RegisterUserRequest request) {
+		var result = registerUser.execute(
+		        new RegisterUserParams(request.email(), request.password(), request.role()));
 
-    return result.fold(
-        error ->
-            switch (error) {
-              case RegisterUserError.AdminSelfRegistration a ->
-                  ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                      .body("Papel ADMIN não pode ser auto-atribuído no registro");
-              case RegisterUserError.EmailAlreadyInUse e ->
-                  ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail já cadastrado");
-            },
-        success ->
-            ResponseEntity.status(HttpStatus.CREATED)
-                .body(new RegisterUserResponse(success.id(), success.email(), success.role())));
-  }
+		return result.fold(error -> switch (error) {
+			case RegisterUserError.AdminSelfRegistration a ->
+			    ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			            .body("Papel ADMIN não pode ser auto-atribuído no registro");
+			case RegisterUserError.EmailAlreadyInUse e ->
+			    ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail já cadastrado");
+		}, success -> ResponseEntity.status(HttpStatus.CREATED)
+		        .body(new RegisterUserResponse(success.id(), success.email(), success.role())));
+	}
 }

@@ -12,19 +12,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
 
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
-  public Either<RegisterUserError, RegisterUserResult> execute(RegisterUserParams params) {
-    if (params.role() == Role.ADMIN) {
-      return Either.left(new RegisterUserError.AdminSelfRegistration());
-    }
-    if (userRepository.existsByEmail(params.email())) {
-      return Either.left(new RegisterUserError.EmailAlreadyInUse(params.email()));
-    }
+	public Either<RegisterUserError, RegisterUserResult> execute(RegisterUserParams params) {
+		if (params.role() == Role.ADMIN) {
+			return Either.left(new RegisterUserError.AdminSelfRegistration());
+		}
+		if (userRepository.existsByEmail(params.email())) {
+			return Either.left(new RegisterUserError.EmailAlreadyInUse(params.email()));
+		}
 
-    var user = new User(params.email(), passwordEncoder.encode(params.password()), params.role());
-    var saved = userRepository.save(user);
-    return Either.right(new RegisterUserResult(saved.getId(), saved.getEmail(), saved.getRole()));
-  }
+		var user = new User(params.email(), passwordEncoder.encode(params.password()),
+		        params.role());
+		var saved = userRepository.save(user);
+		return Either
+		        .right(new RegisterUserResult(saved.getId(), saved.getEmail(), saved.getRole()));
+	}
 }

@@ -10,39 +10,33 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class JWTProvider {
-  private final Algorithm algorithm;
-  private final JWTVerifier verifier;
+	private final Algorithm algorithm;
+	private final JWTVerifier verifier;
 
-  public JWTProvider(Algorithm algorithm) {
-    this.algorithm = algorithm;
-    this.verifier = JWT.require(algorithm).build();
-  }
+	public JWTProvider(Algorithm algorithm) {
+		this.algorithm = algorithm;
+		this.verifier = JWT.require(algorithm).build();
+	}
 
-  public Optional<DecodedJWT> validate(String token) {
-    token = token.startsWith("Bearer ") ? token.substring(7) : token;
-    try {
-      return Optional.of(verifier.verify(token));
-    } catch (JWTVerificationException e) {
-      return Optional.empty();
-    }
-  }
+	public Optional<DecodedJWT> validate(String token) {
+		token = token.startsWith("Bearer ") ? token.substring(7) : token;
+		try {
+			return Optional.of(verifier.verify(token));
+		} catch (JWTVerificationException e) {
+			return Optional.empty();
+		}
+	}
 
-  public String generateJwtToken(GenerateTokenParams params) {
-    var builder =
-        JWT.create()
-            .withIssuer(params.issuer())
-            .withExpiresAt(params.expiresAt())
-            .withSubject(params.subject());
+	public String generateJwtToken(GenerateTokenParams params) {
+		var builder = JWT.create().withIssuer(params.issuer()).withExpiresAt(params.expiresAt())
+		        .withSubject(params.subject());
 
-    params
-        .claims()
-        .forEach(
-            claim -> {
-              builder.withClaim(claim.name(), claim.values());
-            });
+		params.claims().forEach(claim -> {
+			builder.withClaim(claim.name(), claim.values());
+		});
 
-    var token = builder.sign(algorithm);
+		var token = builder.sign(algorithm);
 
-    return token;
-  }
+		return token;
+	}
 }

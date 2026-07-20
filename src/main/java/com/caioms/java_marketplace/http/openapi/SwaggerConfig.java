@@ -8,22 +8,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-  @Bean
-  public OpenAPI openAPI() {
-    return new OpenAPI()
-        .info(
-            new Info()
-                .title("Java Application API")
-                .version("1.0")
-                .description("API for a Java project using Spring Boot and Swagger"))
-        .schemaRequirement("JWT", createSecurityScheme());
-  }
+	@Bean
+	public OpenAPI openAPI() {
+		return new OpenAPI()
+		        .info(new Info().title("Java Application API").version("1.0")
+		                .description("API for a Java project using Spring Boot and Swagger"))
+		        .schemaRequirement("JWT", createSecurityScheme());
+	}
 
-  private SecurityScheme createSecurityScheme() {
-    return new SecurityScheme()
-        .name("JWT")
-        .type(SecurityScheme.Type.HTTP)
-        .scheme("bearer")
-        .bearerFormat("JWT");
-  }
+	private SecurityScheme createSecurityScheme() {
+		return new SecurityScheme().name("JWT").type(SecurityScheme.Type.HTTP).scheme("bearer")
+		        .bearerFormat("JWT");
+	}
 }

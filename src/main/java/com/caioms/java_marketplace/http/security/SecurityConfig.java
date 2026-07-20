@@ -15,29 +15,25 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-  private final SecurityFilter securityFilter;
+	private final SecurityFilter securityFilter;
 
-  private static final String[] SWAGGER_LIST = {
-    "/swagger-ui/**", "/v3/api-docs/**", "/swagger-dark.css", "/scalar/**", "/swagger-ui.html"
-  };
+	private static final String[] SWAGGER_LIST = {"/swagger-ui/**", "/v3/api-docs/**",
+	        "/swagger-dark.css", "/scalar/**", "/swagger-ui.html"};
 
-  @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(
-            auth -> {
-              auth.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll();
-              auth.requestMatchers(SWAGGER_LIST).permitAll();
-              auth.requestMatchers("/auth/**").permitAll();
-              auth.anyRequest().authenticated();
-            })
-        .addFilterBefore(securityFilter, BasicAuthenticationFilter.class);
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> {
+			auth.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll();
+			auth.requestMatchers(SWAGGER_LIST).permitAll();
+			auth.requestMatchers("/auth/**").permitAll();
+			auth.anyRequest().authenticated();
+		}).addFilterBefore(securityFilter, BasicAuthenticationFilter.class);
 
-    return http.build();
-  }
+		return http.build();
+	}
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

@@ -3,4 +3,5 @@ package com.caioms.java_marketplace.modules.identity.application.use_cases.regis
 import com.caioms.java_marketplace.modules.identity.application.models.Role;
 import java.util.UUID;
 
-public record RegisterUserResult(UUID id, String email, Role role) {}
+public record RegisterUserResult(UUID id, String email, Role role) {
+}
