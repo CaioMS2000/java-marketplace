@@ -156,8 +156,13 @@
 						<includes>
 							<include>src/**/*.java</include>
 						</includes>
-						<googleJavaFormat/>
+						<eclipse>
+							<file>${project.basedir}/.config/eclipse-formatter.xml</file>
+						</eclipse>
 						<removeUnusedImports/>
+						<importOrder>
+							<order>\#,</order>
+						</importOrder>
 						<formatAnnotations/>
 					</java>
 				</configuration>
