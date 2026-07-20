@@ -1,4 +1,4 @@
-package com.caioms.java_marketplace.shared.security;
+package com.caioms.java_marketplace.http.security;
 
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;

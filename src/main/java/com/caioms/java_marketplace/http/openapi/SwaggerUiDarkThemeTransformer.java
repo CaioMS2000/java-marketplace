@@ -1,4 +1,4 @@
-package com.caioms.java_marketplace.shared.openapi;
+package com.caioms.java_marketplace.http.openapi;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;

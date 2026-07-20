@@ -1,4 +1,4 @@
-package com.caioms.java_marketplace.shared.security;
+package com.caioms.java_marketplace.http.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
