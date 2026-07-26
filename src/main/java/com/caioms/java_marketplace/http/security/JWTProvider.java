@@ -5,6 +5,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,13 @@ import org.springframework.stereotype.Service;
 public class JWTProvider {
 	private final Algorithm algorithm;
 	private final JWTVerifier verifier;
+
+	public record ClaimData(String name, List<?> values) {
+	}
+
+	public record GenerateTokenParams(String issuer, List<ClaimData> claims, String subject,
+	        Instant expiresAt) {
+	}
 
 	public JWTProvider(Algorithm algorithm) {
 		this.algorithm = algorithm;
