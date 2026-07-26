@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.caioms.java_marketplace.TestcontainersConfiguration;
-import com.caioms.java_marketplace.modules.identity.application.models.CredentialType;
 import com.caioms.java_marketplace.modules.identity.application.models.Role;
 import com.caioms.java_marketplace.modules.identity.application.repositories.CredentialRepository;
 import com.caioms.java_marketplace.modules.identity.application.repositories.UserRepository;
+import com.caioms.java_marketplace.modules.identity.infrastructure.http.dto.LoginRequest;
+import com.caioms.java_marketplace.modules.identity.infrastructure.http.dto.LoginResponse;
 import com.caioms.java_marketplace.modules.identity.infrastructure.http.dto.RegisterUserRequest;
-import com.caioms.java_marketplace.modules.identity.infrastructure.http.dto.RegisterUserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import org.springframework.web.client.RestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
-class AuthRegisterIntegrationTest {
+class AuthLoginIntegrationTest {
 
 	@LocalServerPort
 	private int port;
@@ -44,40 +44,47 @@ class AuthRegisterIntegrationTest {
 		return RestClient.create("http://localhost:" + port);
 	}
 
-	@Test
-	void registersUserAndPersistsHashedPasswordAsCredential() {
-		var request = new RegisterUserRequest("alice@example.com", "secret123", Role.USER);
-
-		var response = client().post().uri("/auth/register").contentType(MediaType.APPLICATION_JSON)
-		        .body(request).retrieve().toEntity(RegisterUserResponse.class);
-
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-		assertThat(response.getBody()).isNotNull();
-		assertThat(response.getBody().id()).isNotNull();
-		assertThat(response.getBody().email()).isEqualTo("alice@example.com");
-		assertThat(response.getBody().role()).isEqualTo(Role.USER);
-
-		var user = userRepository.findByEmail("alice@example.com").orElseThrow();
-		var credentials = credentialRepository.findByUserId(user.getId());
-		assertThat(credentials).hasSize(1);
-
-		var credential = credentials.get(0);
-		assertThat(credential.getType()).isEqualTo(CredentialType.PASSWORD);
-		assertThat(credential.getSubject()).isNotEqualTo("secret123");
-		assertThat(credential.getSubject()).startsWith("$2");
+	private void register(String email, String password) {
+		client().post().uri("/auth/register").contentType(MediaType.APPLICATION_JSON)
+		        .body(new RegisterUserRequest(email, password, Role.USER)).retrieve()
+		        .toBodilessEntity();
 	}
 
 	@Test
-	void rejectsAdminSelfRegistration() {
-		var request = new RegisterUserRequest("eve@example.com", "secret123", Role.ADMIN);
+	void loginComCredenciaisValidas_retornaAccessToken() {
+		register("alice@example.com", "secret123");
+
+		var response = client().post().uri("/auth/login").contentType(MediaType.APPLICATION_JSON)
+		        .body(new LoginRequest("alice@example.com", "secret123")).retrieve()
+		        .toEntity(LoginResponse.class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isNotNull();
+		assertThat(response.getBody().accessToken()).isNotBlank();
+		assertThat(response.getBody().tokenType()).isEqualTo("Bearer");
+	}
+
+	@Test
+	void loginComSenhaErrada_retorna401() {
+		register("bob@example.com", "secret123");
 
 		assertThatThrownBy(
-		        () -> client().post().uri("/auth/register").contentType(MediaType.APPLICATION_JSON)
-		                .body(request).retrieve().toBodilessEntity())
+		        () -> client().post().uri("/auth/login").contentType(MediaType.APPLICATION_JSON)
+		                .body(new LoginRequest("bob@example.com", "wrongpass")).retrieve()
+		                .toBodilessEntity())
 		        .isInstanceOf(HttpClientErrorException.class)
 		        .extracting(ex -> ((HttpClientErrorException) ex).getStatusCode())
-		        .isEqualTo(HttpStatus.BAD_REQUEST);
+		        .isEqualTo(HttpStatus.UNAUTHORIZED);
+	}
 
-		assertThat(userRepository.existsByEmail("eve@example.com")).isFalse();
+	@Test
+	void loginComEmailDesconhecido_retorna401() {
+		assertThatThrownBy(
+		        () -> client().post().uri("/auth/login").contentType(MediaType.APPLICATION_JSON)
+		                .body(new LoginRequest("ghost@example.com", "secret123")).retrieve()
+		                .toBodilessEntity())
+		        .isInstanceOf(HttpClientErrorException.class)
+		        .extracting(ex -> ((HttpClientErrorException) ex).getStatusCode())
+		        .isEqualTo(HttpStatus.UNAUTHORIZED);
 	}
 }
