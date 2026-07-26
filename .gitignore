@@ -42,4 +42,7 @@ generate-commit-message-task.md
 git-info-for-commit.sh
 *.txt
 *.md
-!docs/*/*.md
+!adr/*.md
+!adr/*/*.md
+!notes/*.md
+!notes/*/*.md
