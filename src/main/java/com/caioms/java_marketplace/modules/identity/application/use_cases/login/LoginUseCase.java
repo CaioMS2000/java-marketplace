@@ -1,9 +1,9 @@
 package com.caioms.java_marketplace.modules.identity.application.use_cases.login;
 
+import com.caioms.java_marketplace.modules.identity.application.jwt.AccessTokenIssuer;
 import com.caioms.java_marketplace.modules.identity.application.models.CredentialType;
 import com.caioms.java_marketplace.modules.identity.application.repositories.CredentialRepository;
 import com.caioms.java_marketplace.modules.identity.application.repositories.UserRepository;
-import com.caioms.java_marketplace.modules.identity.application.jwt.AccessTokenIssuer;
 import com.caioms.java_marketplace.modules.identity.application.use_cases.login.error.InvalidCredentials;
 import com.caioms.java_marketplace.modules.identity.application.use_cases.login.error.LoginError;
 import io.vavr.control.Either;
@@ -34,7 +34,7 @@ public class LoginUseCase {
 			return Either.left(new InvalidCredentials());
 		}
 
-		var accessToken = accessTokenIssuer.issue(user.getId(), user.getRole());
+		var accessToken = accessTokenIssuer.issue(user.getId(), user.getRoles());
 		return Either.right(new Result(accessToken));
 	}
 

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.caioms.java_marketplace.TestcontainersConfiguration;
-import com.caioms.java_marketplace.modules.identity.application.models.Role;
 import com.caioms.java_marketplace.modules.identity.application.repositories.CredentialRepository;
 import com.caioms.java_marketplace.modules.identity.application.repositories.UserRepository;
 import com.caioms.java_marketplace.modules.identity.infrastructure.http.dto.LoginRequest;
@@ -46,8 +45,7 @@ class AuthLoginIntegrationTest {
 
 	private void register(String email, String password) {
 		client().post().uri("/auth/register").contentType(MediaType.APPLICATION_JSON)
-		        .body(new RegisterUserRequest(email, password, Role.USER)).retrieve()
-		        .toBodilessEntity();
+		        .body(new RegisterUserRequest(email, password)).retrieve().toBodilessEntity();
 	}
 
 	@Test

@@ -13,7 +13,6 @@ import com.caioms.java_marketplace.modules.identity.application.models.Role;
 import com.caioms.java_marketplace.modules.identity.application.models.User;
 import com.caioms.java_marketplace.modules.identity.application.repositories.CredentialRepository;
 import com.caioms.java_marketplace.modules.identity.application.repositories.UserRepository;
-import com.caioms.java_marketplace.modules.identity.application.use_cases.register.error.AdminSelfRegistration;
 import com.caioms.java_marketplace.modules.identity.application.use_cases.register.error.EmailAlreadyInUse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,8 +35,8 @@ class RegisterUserUseCaseTest {
 	private RegisterUserUseCase registerUser;
 
 	@Test
-	void retornaRightEHasheiaSenhaNaCredential_quandoDadosValidos() {
-		var params = new RegisterUserUseCase.Params("alice@example.com", "secret123", Role.USER);
+	void retornaRightComUserRoleEHasheiaSenhaNaCredential_quandoDadosValidos() {
+		var params = new RegisterUserUseCase.Params("alice@example.com", "secret123");
 		when(userRepository.existsByEmail("alice@example.com")).thenReturn(false);
 		when(passwordEncoder.encode("secret123")).thenReturn("HASHED");
 		when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -46,7 +45,7 @@ class RegisterUserUseCaseTest {
 
 		assertThat(result.isRight()).isTrue();
 		assertThat(result.get().email()).isEqualTo("alice@example.com");
-		assertThat(result.get().role()).isEqualTo(Role.USER);
+		assertThat(result.get().roles()).containsExactly(Role.USER);
 
 		var savedCredential = ArgumentCaptor.forClass(Credential.class);
 		verify(credentialRepository).save(savedCredential.capture());
@@ -56,19 +55,8 @@ class RegisterUserUseCaseTest {
 	}
 
 	@Test
-	void retornaLeftAdminSelfRegistration_quandoRoleAdmin() {
-		var params = new RegisterUserUseCase.Params("eve@example.com", "secret123", Role.ADMIN);
-
-		var result = registerUser.execute(params);
-
-		assertThat(result.isLeft()).isTrue();
-		assertThat(result.getLeft()).isInstanceOf(AdminSelfRegistration.class);
-		verifyNoInteractions(userRepository, credentialRepository, passwordEncoder);
-	}
-
-	@Test
 	void retornaLeftEmailAlreadyInUse_quandoEmailJaExiste() {
-		var params = new RegisterUserUseCase.Params("bob@example.com", "secret123", Role.USER);
+		var params = new RegisterUserUseCase.Params("bob@example.com", "secret123");
 		when(userRepository.existsByEmail("bob@example.com")).thenReturn(true);
 
 		var result = registerUser.execute(params);

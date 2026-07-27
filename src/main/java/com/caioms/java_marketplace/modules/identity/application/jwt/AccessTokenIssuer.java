@@ -5,6 +5,7 @@ import com.caioms.java_marketplace.modules.identity.application.models.Role;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,8 +30,9 @@ public class AccessTokenIssuer {
 		this.accessTtl = accessTtl;
 	}
 
-	public String issue(UUID userId, Role role) {
-		var claims = List.of(new JWTProvider.ClaimData("roles", List.of(role.name())));
+	public String issue(UUID userId, Set<Role> roles) {
+		var roleNames = roles.stream().map(Role::name).toList();
+		var claims = List.of(new JWTProvider.ClaimData("roles", roleNames));
 		var params = new JWTProvider.GenerateTokenParams(issuer, claims, userId.toString(),
 		        Instant.now().plus(accessTtl));
 		return jwtProvider.generateJwtToken(params);

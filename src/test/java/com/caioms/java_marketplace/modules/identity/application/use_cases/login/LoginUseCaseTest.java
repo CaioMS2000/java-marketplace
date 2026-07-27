@@ -6,15 +6,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.caioms.java_marketplace.modules.identity.application.jwt.AccessTokenIssuer;
 import com.caioms.java_marketplace.modules.identity.application.models.Credential;
 import com.caioms.java_marketplace.modules.identity.application.models.CredentialType;
 import com.caioms.java_marketplace.modules.identity.application.models.Role;
 import com.caioms.java_marketplace.modules.identity.application.models.User;
 import com.caioms.java_marketplace.modules.identity.application.repositories.CredentialRepository;
 import com.caioms.java_marketplace.modules.identity.application.repositories.UserRepository;
-import com.caioms.java_marketplace.modules.identity.application.jwt.AccessTokenIssuer;
 import com.caioms.java_marketplace.modules.identity.application.use_cases.login.error.InvalidCredentials;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,13 +39,13 @@ class LoginUseCaseTest {
 
 	@Test
 	void retornaRightComToken_quandoCredenciaisValidas() {
-		var user = new User("alice@example.com", Role.USER);
+		var user = new User("alice@example.com", Set.of(Role.USER));
 		var credential = Credential.password(user, "HASHED");
 		when(userRepository.findByEmail("alice@example.com")).thenReturn(Optional.of(user));
 		when(credentialRepository.findByUserIdAndType(any(), eq(CredentialType.PASSWORD)))
 		        .thenReturn(Optional.of(credential));
 		when(passwordEncoder.matches("secret123", "HASHED")).thenReturn(true);
-		when(accessTokenIssuer.issue(any(), eq(Role.USER))).thenReturn("access-token");
+		when(accessTokenIssuer.issue(any(), eq(Set.of(Role.USER)))).thenReturn("access-token");
 
 		var result = login.execute(new LoginUseCase.Params("alice@example.com", "secret123"));
 
@@ -65,7 +66,7 @@ class LoginUseCaseTest {
 
 	@Test
 	void retornaLeftInvalidCredentials_quandoSenhaErrada() {
-		var user = new User("bob@example.com", Role.USER);
+		var user = new User("bob@example.com", Set.of(Role.USER));
 		var credential = Credential.password(user, "HASHED");
 		when(userRepository.findByEmail("bob@example.com")).thenReturn(Optional.of(user));
 		when(credentialRepository.findByUserIdAndType(any(), eq(CredentialType.PASSWORD)))

@@ -1,7 +1,6 @@
 package com.caioms.java_marketplace.modules.identity.infrastructure.http;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.caioms.java_marketplace.TestcontainersConfiguration;
 import com.caioms.java_marketplace.modules.identity.application.models.CredentialType;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -45,8 +43,8 @@ class AuthRegisterIntegrationTest {
 	}
 
 	@Test
-	void registersUserAndPersistsHashedPasswordAsCredential() {
-		var request = new RegisterUserRequest("alice@example.com", "secret123", Role.USER);
+	void registersUserWithUserRoleAndHashedPasswordCredential() {
+		var request = new RegisterUserRequest("alice@example.com", "secret123");
 
 		var response = client().post().uri("/auth/register").contentType(MediaType.APPLICATION_JSON)
 		        .body(request).retrieve().toEntity(RegisterUserResponse.class);
@@ -55,7 +53,7 @@ class AuthRegisterIntegrationTest {
 		assertThat(response.getBody()).isNotNull();
 		assertThat(response.getBody().id()).isNotNull();
 		assertThat(response.getBody().email()).isEqualTo("alice@example.com");
-		assertThat(response.getBody().role()).isEqualTo(Role.USER);
+		assertThat(response.getBody().roles()).containsExactly(Role.USER);
 
 		var user = userRepository.findByEmail("alice@example.com").orElseThrow();
 		var credentials = credentialRepository.findByUserId(user.getId());
@@ -65,19 +63,5 @@ class AuthRegisterIntegrationTest {
 		assertThat(credential.getType()).isEqualTo(CredentialType.PASSWORD);
 		assertThat(credential.getSubject()).isNotEqualTo("secret123");
 		assertThat(credential.getSubject()).startsWith("$2");
-	}
-
-	@Test
-	void rejectsAdminSelfRegistration() {
-		var request = new RegisterUserRequest("eve@example.com", "secret123", Role.ADMIN);
-
-		assertThatThrownBy(
-		        () -> client().post().uri("/auth/register").contentType(MediaType.APPLICATION_JSON)
-		                .body(request).retrieve().toBodilessEntity())
-		        .isInstanceOf(HttpClientErrorException.class)
-		        .extracting(ex -> ((HttpClientErrorException) ex).getStatusCode())
-		        .isEqualTo(HttpStatus.BAD_REQUEST);
-
-		assertThat(userRepository.existsByEmail("eve@example.com")).isFalse();
 	}
 }
