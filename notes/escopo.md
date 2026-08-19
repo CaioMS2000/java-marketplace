@@ -8,6 +8,19 @@ Backend de marketplace multi-vendedor com escopo deliberadamente estreito e prof
 
 **Critério de sucesso:** um revisor técnico abre o repositório e, em poucos minutos, vê rigor no fluxo de pedido (máquina de estados, idempotência de pagamento, estoque correto sob concorrência) — não 30 endpoints CRUD genéricos.
 
+## Macro nicho sugerido
+
+Marketplace de **tecnologia e cultura geek**, abrangendo categorias como computadores, smartphones, componentes, periféricos, games, livros, quadrinhos, jogos de tabuleiro e colecionáveis. O nicho orienta os dados e exemplos do projeto sem restringir sua arquitetura.
+
+Esse macro nicho possibilita explorar:
+
+- Produtos físicos e digitais.
+- Produtos com variações, como cor, tamanho e plataforma.
+- Marcas e fabricantes.
+- Pré-venda e produtos usados.
+- Estoque, garantia e diferentes métodos de entrega.
+- Vendedores distintos oferecendo o mesmo produto.
+
 ## Atores
 
 - **Cliente (USER)** — navega no catálogo, faz pedido, paga.
