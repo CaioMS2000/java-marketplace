@@ -40,7 +40,12 @@ build/
 *.txt
 *.sh
 *.md
+!README.md
 !adr/*.md
 !adr/*/*.md
 !notes/*.md
 !notes/*/*.md
+!design/*.md
+!design/*/*.md
+!architecture/*.md
+!architecture/*/*.md
